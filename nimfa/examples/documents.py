@@ -105,10 +105,10 @@ import numpy as np
 
 import nimfa
 
-try:
-    import matplotlib.pylab as plb
-except ImportError as exc:
-    warn("Matplotlib must be installed to run Documents example.")
+# try:
+#     import matplotlib.pylab as plb
+# except ImportError as exc:
+#     warn("Matplotlib must be installed to run Documents example.")
 
 
 def run():
@@ -116,7 +116,7 @@ def run():
     V, term2idx, idx2term = read()
     V, term2idx, idx2term = preprocess(V, term2idx, idx2term)
     W, _ = factorize(V)
-    plot(W, idx2term)
+    # plot(W, idx2term)
 
 
 def factorize(V):
@@ -128,16 +128,23 @@ def factorize(V):
     :param V: The Medlars data matrix. 
     :type V: `scipy.sparse.csr_matrix`
     """
-    nmf = nimfa.Nmf(V, seed="random_vcol", rank=12, max_iter=15, update="divergence",
+    print V.shape
+    V = (V - V.min()) / (V.max() - V.min())
+    init_seeds = ["random", "random_c", "random_vcol"]
+    for seed_method in init_seeds:
+        nmf = nimfa.Nmf(V, seed=seed_method, rank=12, max_iter=15, update="divergence",
                     objective="div")
-    print("Algorithm: %s\nInitialization: %s\nRank: %d" % (nmf, nmf.seed, nmf.rank))
-    fit = nmf()
-    sparse_w, sparse_h = fit.fit.sparseness()
-    print("""Stats:
+        fit = nmf()
+        sparse_w, sparse_h = fit.fit.sparseness()
+        print "="*15
+        print("Algorithm: %s\nInitialization: %s\nRank: %d" % (nmf, nmf.seed, nmf.rank))
+        print("""Stats:
             - iterations: %d
             - KL Divergence: %5.3f
             - Euclidean distance: %5.3f
-            - Sparseness basis: %5.3f, mixture: %5.3f""" % (fit.fit.n_iter, fit.distance(), fit.distance(metric='euclidean'), sparse_w, sparse_h))
+            - Sparseness basis: %5.3f, mixture: %5.3f""" % (
+        fit.fit.n_iter, fit.distance(), fit.distance(metric='kl'), sparse_w, sparse_h))
+
     return fit.basis(), fit.coef()
 
 
@@ -214,32 +221,32 @@ def preprocess(V, term2idx, idx2term):
     return V1.tocsr(), term2idx, idx2term
 
 
-def plot(W, idx2term):
-    """
-    Plot the interpretation of NMF basis vectors on Medlars data set. 
-    
-    :param W: Basis matrix of the fitted factorization model.
-    :type W: `scipy.sparse.csr_matrix`
-    :param idx2term: Index-to-term translator.
-    :type idx2term: `dict`
-    """
-    print("Plot highest weighted terms in basis vectors")
-    for c in range(W.shape[1]):
-        if sp.isspmatrix(W):
-            top10 = np.argsort(np.asarray(W[:, c].todense()).flatten())[-10:]
-            val = W[top10, c].todense()
-        else:
-            top10 = np.argsort(np.asarray(W[:, c]).flatten())[-10:]
-            val = W[top10, c]
-        plb.figure(c + 1)
-        plb.barh(np.arange(10) + .5, val, color="yellow", align="center")
-        plb.yticks(np.arange(10) + .5, [idx2term[idx] for idx in top10][::-1])
-        plb.xlabel("Weight")
-        plb.ylabel("Term")
-        plb.title("Highest Weighted Terms in Basis Vector W%d" % (c + 1))
-        plb.grid(True)
-        plb.savefig("documents_basisW%d.png" % (c + 1), bbox_inches="tight")
-
+# def plot(W, idx2term):
+#     """
+#     Plot the interpretation of NMF basis vectors on Medlars data set.
+#
+#     :param W: Basis matrix of the fitted factorization model.
+#     :type W: `scipy.sparse.csr_matrix`
+#     :param idx2term: Index-to-term translator.
+#     :type idx2term: `dict`
+#     """
+#     print("Plot highest weighted terms in basis vectors")
+#     for c in range(W.shape[1]):
+#         if sp.isspmatrix(W):
+#             top10 = np.argsort(np.asarray(W[:, c].todense()).flatten())[-10:]
+#             val = W[top10, c].todense()
+#         else:
+#             top10 = np.argsort(np.asarray(W[:, c]).flatten())[-10:]
+#             val = W[top10, c]
+#         plb.figure(c + 1)
+#         plb.barh(np.arange(10) + .5, val, color="yellow", align="center")
+#         plb.yticks(np.arange(10) + .5, [idx2term[idx] for idx in top10][::-1])
+#         plb.xlabel("Weight")
+#         plb.ylabel("Term")
+#         plb.title("Highest Weighted Terms in Basis Vector W%d" % (c + 1))
+#         plb.grid(True)
+#         plb.savefig("documents_basisW%d.png" % (c + 1), bbox_inches="tight")
+#
 
 stop_words = [
     "a", "able", "about", "across", "after", "all", "almost", "also", "am", "among", "an",

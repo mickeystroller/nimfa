@@ -630,6 +630,8 @@ def elop(X, Y, op):
         try:
             X[X == 0] = np.finfo(X.dtype).eps
             Y[Y == 0] = np.finfo(Y.dtype).eps
+            # 2.22044604925e-16
+            # print np.finfo(Y.dtype).eps
         except ValueError:
             return op(np.mat(X), np.mat(Y))
         return op(np.mat(X), np.mat(Y))

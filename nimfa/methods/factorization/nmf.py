@@ -187,7 +187,7 @@ class Nmf(nmf_std.Nmf_std):
                 self.callback_init(mffit)
             while self.is_satisfied(p_obj, c_obj, iter):
                 p_obj = c_obj if not self.test_conv or iter % self.test_conv == 0 else p_obj
-                self.update()
+                self.update() #Multiplicative update
                 self._adjustment()
                 iter += 1
                 if not self.test_conv or iter % self.test_conv == 0:

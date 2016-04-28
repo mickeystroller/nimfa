@@ -141,8 +141,11 @@ class Lsnmf(nmf_std.Nmf_std):
                  n_run=1, callback=None, callback_init=None, track_factor=False,
                  track_error=False, sub_iter=10, inner_sub_iter=10, beta=0.1, **options):
         self.name = "lsnmf"
+
+        # Initalization methods
         self.aseeds = ["random", "fixed", "nndsvd", "random_c", "random_vcol"]
-        nmf_std.Nmf_std.__init__(self, vars())
+        # print vars()
+        nmf_std.Nmf_std.__init__(self, vars()) 
         self.min_residuals = 1e-5 if not self.min_residuals else self.min_residuals
         self.tracker = mf_track.Mf_track() if self.track_factor and self.n_run > 1 \
                                               or self.track_error else None
